@@ -1,0 +1,41 @@
+# q-1234.yaml
+
+title: 'US States'
+
+imageUrl: https://www.physicsforums.com/styles/physicsforums/xenforo/logo.og.png
+imageAlt: PhysicsForums logo
+imageCopyright: >
+  Image copyright © 2001-2020
+  <a
+    target="_blank"
+    href="https://www.physicsforums.com/"
+    >Physics Forums</a>.
+
+questions:
+  - [ Oregon, 37 ]
+  - [ Utah, 44 ]
+  - [ California, 5 ]
+  - [ Missouri, 25 ]
+  - [ Kentucky, 17 ]
+  - [ Texas, 43 ]
+  - [ Alaska, 2 ]
+  - [ New York, 32 ]
+  - [ Maine, 19 ]
+  - [ Connecticut, 7 ]
+  - [ Michigan, 22 ]
+  - [ North Dakota, 34 ]
+  - [ Wyoming, 50 ]
+
+  - [ Vermont, 45 ]
+  - [ Tennessee, 42 ]
+  - [ Alabama, 1 ]
+  - [ Nebraska, 27 ]
+  - [ Hawaii, 11 ]
+  - [ Montana, 26 ]
+  - [ Maryland, 20 ]
+  - [ Massachusetts, 21 ]
+  - [ Indiana, 14 ]
+  - [ South Carolina, 40 ]
+  - [ Virginia, 46 ]
+  - [ New Mexico, 31 ]
+  - [ Washington, 47 ]

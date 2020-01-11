@@ -1,1 +1,237 @@
-Hello World!
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Quiz</title>
+
+    <!-- Application CSS -->
+    <style>
+      .answer-row { font-size: 2rem; }
+      .input-group.answer * { font-size: 2rem; }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+
+        <div class="row title-row py-2">
+          <div class="col">
+            <h1 v-if="true">Quiz - {{ quizTitle }}</h1>
+            <h1 v-else>Quiz - loading questions</h1>
+          </div>
+        </div><!-- /.title-row -->
+
+        <div class="row questions-row py-2">
+          <div class="col-6 col-md-3 order-2 order-md-1 questions-left">
+            <div class="list-group" v-if="questions">
+              <div
+                v-for="questionNumber in leftQuestions"
+                class="list-group-item px-3 py-1"
+                :class="{ active: questionNumber === questionIndex }"
+                >{{ questions[questionNumber][0]}}</div>
+            </div>
+          </div><!-- /.questions-left -->
+
+          <div class="col-12 col-md-6 order-1 question-image mb-2">
+            <div class="card text-center">
+              <img :src="imageUrl" :alt="imageAlt" class="card-image-top">
+              <div class="card-body">
+                <p class="card-text small" v-html="imageCopyright"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3 order-3 questions-right">
+            <div class="list-group" v-if="questions">
+              <div
+                v-for="questionNumber in rightQuestions"
+                class="list-group-item px-3 py-1"
+                :class="{ active: questionNumber === questionIndex }"
+                >{{ questions[questionNumber][0]}}</div>
+            </div>
+          </div><!-- /.questions-right -->
+
+        </div><!-- /.questions-row -->
+
+        <div class="row answer-row py-2">
+          <div class="col-12 col-sm-4">
+            <form @submit.prevent="checkAnswer">
+              <div class="input-group answer">
+                <input
+                  v-model="answerValue"
+                  class="form-control text-center"
+                  placeholder="??"
+                  :disabled="isCorrect !== null"
+                  >
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" @click.stop="checkAnswer">?</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="col-12 col-sm-8">
+            <span v-if="isCorrect === null">
+              <button
+                class="btn btn-outline-secondary"
+                @click.stop="nextQuestion"
+                >Next question</button>
+            </span>
+
+            <span v-if="isCorrect === true">
+              <button
+                class="btn btn-success"
+                @click.stop="nextQuestion"
+                >&#x2713; next question</button>
+            </span>
+
+            <span v-if="isCorrect === false">
+              <button
+                class="btn btn-danger"
+                @click.stop="resetAnswer"
+                >&#x2717; try again</button>
+              <button
+                class="btn btn-outline-secondary"
+                @click.stop="nextQuestion"
+                >Next question</button>
+            </span>
+          </div>
+        </div><!-- /.answer-row -->
+
+      </div>
+    </div>
+
+    <!-- YAML parser -->
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js"></script>
+
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+    <!-- Quiz application -->
+    <script>
+      (function () {
+        // Question file location.
+        const quizFile = './questions/q-1234.yaml';
+
+        // Load and parse the question file.
+        function mounted() {
+          fetch(quizFile)
+            .then(res => res.text())
+            .then((res) => {
+              // Parse the file and extract what we want.
+              const quiz = jsyaml.safeLoad(res);
+
+              this.quizTitle = quiz.title || null;
+              this.questions = quiz.questions || null;
+              this.imageUrl = quiz.imageUrl || null;
+              this.imageAlt = quiz.imageAlt || null;
+              this.imageCopyright = quiz.imageCopyright || null;
+
+              this.selectQuestion();
+            })
+            .catch((err) => {
+              console.log('Error loading questions:', err.message)
+            });
+        }
+
+        // Select a random question.
+        function selectQuestion() {
+          let nextQuestion;
+          do {
+            nextQuestion = Math.floor(Math.random() * this.questions.length);
+          } while (this.questionIndex === nextQuestion)
+          this.questionIndex = nextQuestion;
+        }
+
+        // Move to the next question.
+        function nextQuestion() {
+          this.isCorrect = null;
+          this.answerValue = null;
+          this.selectQuestion();
+        }
+
+        // Start the Vue app.
+        new Vue({
+          el: '#app',
+
+          data: () => {
+            return {
+              quizTitle: null,
+              questions: null,
+              questionIndex: null,
+              answerValue: null,
+              imageUrl: null,
+              imageAlt: null,
+              imageCopyright: null,
+              isCorrect: null,
+            }
+          },
+
+          computed: {
+            // Calculate the index of the last item of the first half of the questions.
+            halfWay() {
+              return Math.floor((this.questions.length) / 2);
+            },
+
+            // Get the correct answer for the current question.
+            correctAnswer() {
+              return this.questions[this.questionIndex][1];
+            },
+
+            // Build an array of pointers to the first half of the questions.
+            leftQuestions() {
+              const half = [];
+              for (let i = 0; i < this.halfWay; i++) {
+                half.push(i);
+              }
+              return half;
+            },
+
+            // Build an array of pointers to the second half of the questions.
+            rightQuestions() {
+              const half = [];
+              for (let i = this.halfWay; i < this.questions.length; i++) {
+                half.push(i);
+              }
+              return half;
+            },
+          },
+
+          // The action to run when the app is mounted, defined above.
+          mounted,
+
+          // Methods used by the app, defined above.
+          methods: {
+            // Move to the next question.
+            nextQuestion,
+
+            // Set this.questionIndex to a random question.
+            selectQuestion,
+
+            // Reset the answer.
+            resetAnswer() {
+              this.isCorrect = null;
+              this.answerValue = null;
+            },
+
+            // Check the answer.
+            checkAnswer() {
+              console.log(this.correctAnswer);
+              if (parseInt(this.answerValue) === this.correctAnswer) {
+                this.isCorrect = true;
+                return;
+              }
+              this.isCorrect = false;
+            },
+          },
+        });
+      })();
+    </script>
+  </body>
+</html>
