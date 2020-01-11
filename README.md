@@ -1,7 +1,7 @@
 # Retro Quiz
 
 A retro-style quiz inspired by
-[a post on PhysicsForums]().
+[a post on PhysicsForums](https://www.physicsforums.com/threads/educational-games.982845/post-6283654).
 
 ## Installation
 
